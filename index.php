@@ -1,15 +1,21 @@
 <?php
-session_start();
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', true);
-error_reporting(error_reporting() & ~E_NOTICE);
-date_default_timezone_set('Asia/Bangkok');	
+// ตั้งค่าพารามิเตอร์ของคุกกี้สำหรับ session เพื่อเพิ่มความปลอดภัยในการจัดการ session โดยมีการตั้งค่า httponly, secure และ samesite
+session_set_cookie_params([
+  'httponly' => true, // ป้องกันการเข้าถึงคุกกี้จาก JavaScript เพื่อป้องกันการโจมตีแบบ XSS
+  'secure' => !empty($_SERVER['HTTPS']), // true เมื่อใช้ https
+  'samesite' => 'Lax', // ป้องกันการส่งคุกกี้ในคำขอข้ามไซต์ (Cross-Site Request Forgery - CSRF) โดยอนุญาตให้ส่งคุกกี้ในคำขอที่มาจากไซต์เดียวกันเท่านั้น
+]);
 
-include_once ('include/function.inc.php');
-require_once ('include/connect_db.inc.php');
-require_once ('include/class_crud.inc.php');
-require_once ('include/setting.inc.php');
-require_once ('include/language.inc.php');
+session_start();
+define('APP_ROOT', __DIR__); // กำหนดค่าคงที่ APP_ROOT เป็นเส้นทางของไดเรกทอรีปัจจุบัน ซึ่งจะใช้ในการอ้างอิงเส้นทางของไฟล์ต่าง ๆ ในโปรเจกต์ได้อย่างสะดวกและปลอดภัยมากขึ้น โดยไม่ต้องกังวลเกี่ยวกับเส้นทางสัมพัทธ์ที่อาจทำให้เกิดปัญหาในการโหลดไฟล์ในบางกรณี
+
+require_once APP_ROOT . '/include/error_report.inc.php'; // รวมไฟล์ error_report.inc.php เพื่อกำหนดการแสดงข้อผิดพลาดและตั้งค่าโซนเวลา
+require_once APP_ROOT . '/include/auth.inc.php'; // รวมไฟล์ auth.inc.php 
+include_once (APP_ROOT . '/include/function.inc.php');
+require_once (APP_ROOT . '/include/connect_db.inc.php');
+require_once (APP_ROOT . '/include/class_crud.inc.php');
+require_once (APP_ROOT . '/include/setting.inc.php');
+require_once (APP_ROOT . '/include/language.inc.php');
 
 /*--------------------------------------------------------- 
 รูปแบบโครงสร้างแบบ SPA (Single Page Application) โดยใช้ URL hash เพื่อจัดการการนำทางภายในแอปพลิเคชัน ซึ่งช่วยให้หน้าเว็บไม่ต้องรีเฟรชใหม่ทุกครั้งที่ผู้ใช้คลิกเมนูหรือเปลี่ยนหน้า โดย URL จะมีรูปแบบเช่น #/app/dashboard/ จะเป็นการระบุเส้นทางภายในแอปพลิเคชัน และการใช้ URL hash ยังช่วยให้สามารถจัดการประวัติการเข้าชมของผู้ใช้ได้ง่ายขึ้น และยังสามารถทำงานร่วมกับ JavaScript เพื่อโหลดเนื้อหาที่เกี่ยวข้องกับแต่ละหน้าได้อย่างรวดเร็วโดยไม่ต้องรีเฟรชหน้าใหม่ทั้งหมด
@@ -212,7 +218,7 @@ $crud = new CRUD(); ##สร้างออปเจค $crud เพื่อเ
               <!-- Default box -->
               <div class="card">
                 <div class="card-header">
-                  <h3 class="title-page card-title mb-0 fw-bold">Login</h3>
+                  <h4 class="title-page card-title mb-0 fw-bold"></h4><span class="sub-title-page align-middle"></span>
                     <!--<div class="col-sm-12">
                       <ol class="breadcrumb float-sm-end txt_smaller p-0 m-0">
                         <li class="breadcrumb-item"><a href="./">Home</a></li>

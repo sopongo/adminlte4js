@@ -149,7 +149,10 @@ window.addEventListener('DOMContentLoaded', () => {
             mount.innerHTML = cachedMenu;
             afterSidebarInjected();
         } else {
-            fetch('fetch_sidebar.inc.php')
+            fetch('fetch_sidebar.inc.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
                 .then(res => res.text())
                 .then(html => {
                     sessionStorage.setItem('sidebar_html', html);
@@ -204,6 +207,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 // 1. เปลี่ยน Title ของหน้าเว็บตามที่ Backend ส่งมา
                 data['meta-title'] && (document.title = data['meta-title'] + ' | CMMS');                
                 data['title-page'] && (document.querySelector('.title-page').innerText = data['title-page']);
+                //data['sub-title-page'] && (document.querySelector('.sub-title-page').innerHTML = data['sub-title-page']);
+                document.querySelector('.sub-title-page') && (document.querySelector('.sub-title-page').innerHTML = data['sub-title-page'] || '');
 
                 // 2. แทนที่เนื้อหาหน้าเพจ
                 appContainer.innerHTML = data.result_html;

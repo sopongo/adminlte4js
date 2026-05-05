@@ -1,20 +1,19 @@
 <?php
 session_start();
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', true);
-error_reporting(error_reporting() & ~E_NOTICE);
-date_default_timezone_set('Asia/Bangkok');
+define('APP_ROOT', __DIR__); // กำหนดค่าคงที่ APP_ROOT เป็นเส้นทางของไดเรกทอรีปัจจุบัน ซึ่งจะใช้ในการอ้างอิงเส้นทางของไฟล์ต่าง ๆ ในโปรเจกต์ได้อย่างสะดวกและปลอดภัยมากขึ้น โดยไม่ต้องกังวลเกี่ยวกับเส้นทางสัมพัทธ์ที่อาจทำให้เกิดปัญหาในการโหลดไฟล์ในบางกรณี
+
+require_once APP_ROOT . '/include/error_report.inc.php'; // รวมไฟล์ error_report.inc.php เพื่อกำหนดการแสดงข้อผิดพลาดและตั้งค่าโซนเวลา
 
 header('Content-Type: application/json; charset=utf-8'); // ตอบกลับเป็น JSON
 
 ## ต้องเปิด Zend OPcache เพื่อให้โหลดไฟล์นี้ครั้งแรกแล้วเก็บไว้ใน cache เพื่อให้การเรียกใช้งานครั้งถัดไปเร็วขึ้น 
 ## กรณีรันบน laragon ให้ดูที่ extensions > opcache ว่าติกถูกเปิดใช้งานหรือไม่ และตั้งค่า opcache.enable=1 ใน php.ini ด้วย
-
-require_once ('include/setting.inc.php');
-require_once ('include/function.inc.php');
-require_once ('include/connect_db.inc.php');
-require_once ('include/class_crud.inc.php');
-require_once ('include/language.inc.php');
+require_once APP_ROOT . '/include/auth.inc.php'; // รวมไฟล์ auth.inc.php 
+include_once (APP_ROOT . '/include/function.inc.php');
+require_once (APP_ROOT . '/include/connect_db.inc.php');
+require_once (APP_ROOT . '/include/setting.inc.php');
+require_once (APP_ROOT . '/include/language.inc.php');
+require_once (APP_ROOT . '/include/class_crud.inc.php');
 
 Language::lang_Login&&Language::lang_menu; // โหลดภาษาที่ใช้ในหน้า Login และเมนูจากคลาส Language
 
@@ -44,6 +43,19 @@ $data = sanitizeInput($data); // ทำความสะอาดข้อม�
 
 
 switch ($action) {
+    case 'fetch-static-page':
+        echo json_encode([
+            'status'      => 'success',
+            'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK
+            'message'     => 'Static page fetched successfully',
+            'meta-title' => 'Static Page', // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
+            'title-page' => 'Static Page',
+            'sub-title-page' => ($data['id'] ?? '') ? '<i class="bi bi-chevron-double-right small"></i> Sub Title ID: ' . htmlspecialchars($data['id'], ENT_QUOTES, 'UTF-8') : '', // ส่ง sub-title-page กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Sub Title ของหน้าเว็บได้ตามที่ Backend กำหนด โดยใช้ข้อมูลจาก $data['id'] ถ้ามี และทำความสะอาดข้อมูลด้วย htmlspecialchars เพื่อป้องกันการหลุดกรอบ HTML
+            'result_html' => renderView('module/static_page/view/static_page.ui.php'),
+            'result_js'   => renderView('module/static_page/control/static_page.js.php')
+        ]);
+        
+    break;
     case 'logout':
         session_destroy(); // ทำลาย session ทั้งหมดเพื่อออกจากระบบ
         //header('location: ./'); // รีเฟรชหน้าใหม่เพื่อให้กลับไปที่หน้า Login
@@ -149,21 +161,11 @@ switch ($action) {
         $resultLogin = $objCrud->getRow($sqlQuery, [':email' => $data['email'], ':active' => 1]);
 
         if ($resultLogin && isset($resultLogin['id_user']) && password_verify(MySetting::Hash . $raw_password, $resultLogin['password'])) {
+            session_regenerate_id(true); // สร้าง session ID ใหม่เพื่อป้องกันการโจมตีแบบ Session Fixation
             $result_html = '';
             $result_html_menu = '';
             $_SESSION['user_id'] = $resultLogin['id_user']; // เก็บ user_id ใน session เพื่อใช้ในการตรวจสอบการล็อกอินในครั้งถัดไป
-            $checkRole = $resultLogin['role'] ?? 2; // กำหนดค่าเริ่มต้นเป็น 2 (User) หากไม่มีข้อมูล role ในฐานข้อมูล
-            $_SESSION['permissions'] = MySetting::role[$checkRole] ?? []; // เก็บสิทธิ์การเข้าถึงใน session เพื่อให้สามารถตรวจสอบสิทธิ์การเข้าถึงในแต่ละหน้าได้
-
-            foreach($_SESSION['permissions'] as $key => $value) {
-                if (is_array($value)) {
-                    foreach($value as $subKey => $subValue) {
-                        $result_html_menu .= '<li class="nav-item"><a href="' . $subValue . '" class="nav-link">' . ucfirst($subKey) . '</a></li>';
-                    }
-                } else {
-                    $result_html_menu .= '<li class="nav-item"><a href="' . $value . '" class="nav-link">' . ucfirst($key) . '</a></li>';
-                }
-            }
+            $_SESSION['role'] = $resultLogin['role']; // เก็บ role ใน session เพื่อใช้ในการแสดงข้อมูลผู้ใช้ในหน้าเว็บ
 
             echo json_encode([
                 'status' => 'success', 
