@@ -1,0 +1,8 @@
+/* แก้กรณีมี rule ไปบังคับ .fade ให้ opacity:1 !important */
+.modal-backdrop.fade {
+  opacity: 0 !important; /* state ตอนยังไม่ show */
+}
+
+.modal-backdrop.fade.show {
+  opacity: 0.8 !important; /* ปรับความมืดที่ต้องการ */
+}
