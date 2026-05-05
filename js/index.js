@@ -74,6 +74,10 @@ window.addEventListener('DOMContentLoaded', () => {
                     const parentItem = parentTreeView.closest('.nav-item');
                     if (parentItem) {
                         parentItem.classList.add('menu-open');
+                        // ลบ inline display:none (ที่ AdminLTE slideUp ทิ้งไว้) เพื่อให้
+                        // CSS rule ".menu-open > .nav-treeview { display: block }" ทำงานได้
+                        // โดยไม่บังคับ display:block ตรง ๆ ซึ่งจะชน animation ในอนาคต
+                        parentTreeView.style.removeProperty('display');
 
                         const parentLink = parentItem.querySelector(':scope > .nav-link');
                         if (parentLink) {
@@ -85,6 +89,76 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // ===================================================
+    // 3. ฟังก์ชันโหลดเมนู Sidebar ผ่าน fetch
+    // ===================================================
+    const loadSidebar = () => {
+        const mount = document.getElementById('left-sidebar-menu');
+        if (!mount) {
+            console.warn("Element #left-sidebar-menu not found");
+            return;
+        }
+
+        const cachedMenu = sessionStorage.getItem('sidebar_html');
+
+        // Re-init AdminLTE Treeview click binding หลัง inject HTML เสร็จ
+        // AdminLTE4 bind treeview listener ตอน DOMContentLoaded แต่เมนูของเราถูก inject ทีหลัง
+        // จึงต้อง replicate การ bind event เดิมของ AdminLTE ให้กับ element ที่เพิ่ง inject
+        const reInitAdminLTESidebar = () => {
+            if (!window.adminlte?.Treeview) {
+                console.warn('AdminLTE Treeview is not available (check adminlte JS include order).');
+                return;
+            }
+
+            // หา [data-lte-toggle="treeview"] ที่เพิ่ง inject แล้วผูก click listener ใหม่
+            // (เลียนแบบ Data API ของ AdminLTE ที่ปกติจะทำตอน DOMContentLoaded)
+            const treeviewContainers = document.querySelectorAll('[data-lte-toggle="treeview"]');
+            treeviewContainers.forEach((container) => {
+                container.addEventListener('click', (event) => {
+                    const target = event.target;
+                    const targetItem = target.closest('.nav-item');
+                    const targetLink = target.closest('.nav-link');
+
+                    // ป้องกัน navigation สำหรับลิงก์ที่ใช้ href="#" เป็น parent treeview toggle
+                    if (target?.getAttribute('href') === '#' || targetLink?.getAttribute('href') === '#') {
+                        event.preventDefault();
+                    }
+
+                    if (targetItem) {
+                        const accordionAttr = container.dataset.accordion;
+                        const animationSpeedAttr = container.dataset.animationSpeed;
+                        const config = {
+                            accordion: accordionAttr === undefined ? true : accordionAttr === 'true',
+                            animationSpeed: animationSpeedAttr === undefined ? 300 : Number(animationSpeedAttr)
+                        };
+                        const treeview = new window.adminlte.Treeview(targetItem, config);
+                        treeview.toggle();
+                    }
+                });
+            });
+        };
+
+        // เรียกทุกครั้งหลัง sidebar ถูก inject (ทั้ง cached และ fetch ใหม่)
+        const afterSidebarInjected = () => {
+            reInitAdminLTESidebar(); // ทำให้ animation toggle + submenu treeview กลับมาทำงาน
+            updateActiveMenu();
+            initSidebarSearch();    // ผูก event ค้นหาเมนูทันที
+        };
+
+        if (cachedMenu) {
+            mount.innerHTML = cachedMenu;
+            afterSidebarInjected();
+        } else {
+            fetch('fetch_sidebar.inc.php')
+                .then(res => res.text())
+                .then(html => {
+                    sessionStorage.setItem('sidebar_html', html);
+                    mount.innerHTML = html;
+                    afterSidebarInjected();
+                })
+                .catch(err => console.error("Load sidebar error:", err));
+        }
+    };
 
     // ===================================================
     // 5. ฟังก์ชันจัดการ Route เปลี่ยนหน้าเพจ (SPA Logic)
@@ -164,6 +238,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // 6. การผูก Event และสั่งเริ่มทำงานตอนเปิดเว็บ
     // ===================================================
     window.addEventListener('hashchange', handleRoute);
-    
+
+    loadSidebar();
     handleRoute(); 
 });
