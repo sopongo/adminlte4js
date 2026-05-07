@@ -132,6 +132,18 @@ switch ($action) {
     break;
 
     case 'login':
+        if (!empty($_SESSION['user_id'])) {
+            echo json_encode([
+                'status'    => 'success',
+                'http_code' => http_response_code(200),
+                'message'   => 'Already logged in',
+                'redirect'  => '#/app/home',
+                'result_html' => '',
+                'result_js' => ''
+            ]);
+            exit();
+        }
+
         //$result_html = renderView('module/login/view/view.inc.php');
         echo json_encode([
             'status'      => 'success',
