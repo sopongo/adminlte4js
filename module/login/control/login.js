@@ -86,6 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (actionPage) {
             fetch('fetch.inc.php?p=' + actionPage, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ path: actionPage, id: idSegment })
             })
@@ -94,6 +95,13 @@ window.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
+                if (data.redirect) {
+                    const targetUrl = `${window.location.pathname}${window.location.search}${data.redirect}`;
+                    window.history.replaceState(null, '', targetUrl);
+                    window.location.replace(targetUrl);
+                    return;
+                }
+
                 appContainer.innerHTML = data.result_html;
 
                 // ค้นหา <script> ในก้อนที่เพิ่งฉีดเข้าไปแล้วรันมัน

@@ -164,6 +164,7 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             fetch('fetch_sidebar.inc.php', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
             })
                 .then(res => res.text())
@@ -209,6 +210,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (actionPage) {
             fetch('fetch.inc.php?p=' + actionPage, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ path: actionPage, id: idSegment })
             })
@@ -219,6 +221,14 @@ window.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 // ✅ DEBUG: ดูให้ชัดว่า server ส่งอะไรมาจริง
                 console.log('fetch.inc.php response:', data);
+
+                if (data.redirect) {
+                    const targetUrl = `${window.location.pathname}${window.location.search}${data.redirect}`;
+                    if (window.location.hash === data.redirect) return;
+                    window.history.replaceState(null, '', targetUrl);
+                    window.dispatchEvent(new Event('hashchange'));
+                    return;
+                }
 
                 // 1. เปลี่ยน Title ของหน้าเว็บตามที่ Backend ส่งมา
                 data['meta-title'] && (document.title = data['meta-title'] + ' | CMMS');                
