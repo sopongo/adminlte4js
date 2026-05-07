@@ -133,15 +133,6 @@ switch ($action) {
 
     case 'login':
         //$result_html = renderView('module/login/view/view.inc.php');
-        if (!empty($_SESSION['user_id'])) {
-            echo json_encode([
-                'status'    => 'success',
-                'http_code' => http_response_code(200),
-                'message'   => 'Already logged in, redirecting',
-                'redirect'  => '#/app/dashboard' // ส่งคำสั่งให้ JavaScript ฝั่ง Client เปลี่ยนหน้าไปที่ Dashboard แทนที่จะโหลดหน้า Login ซ้ำอีกครั้ง
-            ]);
-            exit;
-        }
         echo json_encode([
             'status'      => 'success',
             'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK

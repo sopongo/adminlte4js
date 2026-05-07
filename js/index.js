@@ -219,14 +219,7 @@ window.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 // ✅ DEBUG: ดูให้ชัดว่า server ส่งอะไรมาจริง
                 console.log('fetch.inc.php response:', data);
-                // ✅ NEW: รองรับ redirect จาก server (ต้องทำก่อน render)
-                if (data && data.redirect) {
-                    if (window.location.hash !== data.redirect) {
-                    window.location.hash = data.redirect;
-                    }
-                    return; // สำคัญ: กันโค้ดด้านล่างทำงานต่อ
-                }   
-                
+
                 // 1. เปลี่ยน Title ของหน้าเว็บตามที่ Backend ส่งมา
                 data['meta-title'] && (document.title = data['meta-title'] + ' | CMMS');                
                 data['title-page'] && (document.querySelector('.title-page').innerText = data['title-page']);
