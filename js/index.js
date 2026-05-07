@@ -43,7 +43,19 @@ window.addEventListener('DOMContentLoaded', () => {
     const updateActiveMenu = () => {
         const currentHash = window.location.hash;
         console.log("Current URL Hash:", currentHash);
+
         if (!currentHash) return;
+
+        // ✅ NEW: ตัด id/segment ท้ายออก ให้เหลือแค่ #/app/<page>
+        // ตัวอย่าง: "#/app/fetch-static-page/1234" -> "#/app/fetch-static-page"
+        const normalizedHash = (() => {
+            const parts = currentHash.split('?')[0].split('#/app/'); // กัน querystring เผื่อมี
+            if (parts.length < 2) return currentHash.split('?')[0];
+
+            const afterApp = parts[1];          // "fetch-static-page/1234"
+            const page = afterApp.split('/')[0]; // "fetch-static-page"
+            return `#/app/${page}`;
+        })();
 
         const navLinks = document.querySelectorAll('#navigation .nav-link');
 
@@ -51,6 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
         navLinks.forEach(link => {
             link.classList.remove('active');
             const parentItem = link.closest('.nav-item');
+
             if (parentItem) {
                 parentItem.classList.remove('menu-open');
                 // ❗️อย่าบังคับ display none เพราะจะชน animation ของ AdminLTE Treeview
@@ -66,7 +79,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const cleanHref = hrefAttr.replace('./', '');
 
-            if (cleanHref === currentHash) {
+            if (cleanHref === normalizedHash) {
                 link.classList.add('active');
 
                 const parentTreeView = link.closest('.nav-treeview');

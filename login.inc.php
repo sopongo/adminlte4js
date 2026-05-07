@@ -1,6 +1,7 @@
 <?php
-require_once 'include/setting.inc.php';
+session_start();
 
+require_once 'include/setting.inc.php';
 ?>
 <!doctype html>
 <html lang="en">

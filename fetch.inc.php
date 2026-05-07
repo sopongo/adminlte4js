@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 define('APP_ROOT', __DIR__); // กำหนดค่าคงที่ APP_ROOT เป็นเส้นทางของไดเรกทอรีปัจจุบัน ซึ่งจะใช้ในการอ้างอิงเส้นทางของไฟล์ต่าง ๆ ในโปรเจกต์ได้อย่างสะดวกและปลอดภัยมากขึ้น โดยไม่ต้องกังวลเกี่ยวกับเส้นทางสัมพัทธ์ที่อาจทำให้เกิดปัญหาในการโหลดไฟล์ในบางกรณี
 
 require_once APP_ROOT . '/include/error_report.inc.php'; // รวมไฟล์ error_report.inc.php เพื่อกำหนดการแสดงข้อผิดพลาดและตั้งค่าโซนเวลา
@@ -40,7 +41,6 @@ if (!empty($_POST)) { // --- 1. ตรวจสอบข้อมูลจาก
 $raw_password = $data['password'] ?? '';
 
 $data = sanitizeInput($data); // ทำความสะอาดข้อมูลที่ได้รับมา
-
 
 switch ($action) {
     case 'fetch-static-page':

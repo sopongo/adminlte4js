@@ -217,14 +217,9 @@ $crud = new CRUD(); ##สร้างออปเจค $crud เพื่อเ
             <div class="col-12">
               <!-- Default box -->
               <div class="card">
-                <div class="card-header">
-                  <h4 class="title-page card-title mb-0 fw-bold"></h4><span class="sub-title-page align-middle"></span>
-                    <!--<div class="col-sm-12">
-                      <ol class="breadcrumb float-sm-end txt_smaller p-0 m-0">
-                        <li class="breadcrumb-item"><a href="./">Home</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Login</li>
-                      </ol>
-                    </div>-->
+                <div id="btn-back" class="card-header d-flex align-items-center"><a href="javascript:history.back()" class="btn btn-sm btn-outline-gray py-0 me-2 shadow-sm"><i class="bi bi-chevron-double-left small"></i> Back</a>
+                <h4 class="title-page card-title mb-0 fw-bold"></h4>
+                <span class="sub-title-page ms-2 small text-muted"></span>
                 </div>
                 <div class="card-body">
                   <div class="app"></div>
