@@ -2,6 +2,8 @@
 session_start();
 
 require_once 'include/setting.inc.php';
+require_once 'include/error_report.inc.php';
+require_once 'include/auth.inc.php'; // รวมไฟล์ auth.inc.php
 ?>
 <!doctype html>
 <html lang="en">

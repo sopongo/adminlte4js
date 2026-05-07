@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 define('APP_ROOT', __DIR__); // กำหนดค่าคงที่ APP_ROOT เป็นเส้นทางของไดเรกทอรีปัจจุบัน ซึ่งจะใช้ในการอ้างอิงเส้นทางของไฟล์ต่าง ๆ ในโปรเจกต์ได้อย่างสะดวกและปลอดภัยมากขึ้น โดยไม่ต้องกังวลเกี่ยวกับเส้นทางสัมพัทธ์ที่อาจทำให้เกิดปัญหาในการโหลดไฟล์ในบางกรณี
 
 require_once APP_ROOT . '/include/error_report.inc.php'; // รวมไฟล์ error_report.inc.php เพื่อกำหนดการแสดงข้อผิดพลาดและตั้งค่าโซนเวลา
@@ -134,6 +133,15 @@ switch ($action) {
 
     case 'login':
         //$result_html = renderView('module/login/view/view.inc.php');
+        if (!empty($_SESSION['user_id'])) {
+            echo json_encode([
+                'status'    => 'success',
+                'http_code' => http_response_code(200),
+                'message'   => 'Already logged in, redirecting',
+                'redirect'  => '#/app/dashboard' // ส่งคำสั่งให้ JavaScript ฝั่ง Client เปลี่ยนหน้าไปที่ Dashboard แทนที่จะโหลดหน้า Login ซ้ำอีกครั้ง
+            ]);
+            exit;
+        }
         echo json_encode([
             'status'      => 'success',
             'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK
