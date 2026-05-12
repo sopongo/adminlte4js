@@ -94,7 +94,6 @@ $crud = new CRUD(); ##สร้างออปเจค $crud เพื่อเ
   <!--end::Required Plugin(AdminLTE)-->
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -107,14 +106,8 @@ $crud = new CRUD(); ##สร้างออปเจค $crud เพื่อเ
       <div class="container-fluid">
         <!--begin::Start Navbar Links พื้นที่ด้านบนสุด-->
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-              <i class="bi bi-list"></i>
-            </a>
-          </li>
-          <li class="nav-item d-none d-md-block">
-            <a href="#" class="nav-link">How to</a>
-          </li>
+          <li class="nav-item"><a class="fs-5 nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a></li>
+          <li class="nav-item"><a href="#" class="nav-link">How to</a></li>
           <!--<li class="nav-item d-none d-md-block txt_smaller">
             <a href="#" class="nav-link">Login</a>
           </li>-->
@@ -219,7 +212,7 @@ $crud = new CRUD(); ##สร้างออปเจค $crud เพื่อเ
               <div class="card">
                 <div id="btn-back" class="card-header d-flex align-items-center"><a href="javascript:history.back()" class="btn btn-sm btn-outline-gray py-0 me-2 shadow-sm"><i class="bi bi-chevron-double-left small"></i> Back</a>
                 <h4 class="title-page card-title mb-0 fw-bold"></h4>
-                <span class="sub-title-page ms-2 small text-muted"></span>
+                <span class="sub-title-page ms-0 ps-2 pt-1 small text-muted align-items-center"></span>
                 </div>
                 <div class="card-body">
                   <div class="app"></div>

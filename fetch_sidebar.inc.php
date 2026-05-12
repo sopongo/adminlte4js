@@ -41,8 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             <!--begin::Sidebar Menu-->
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="true" id="navigation">
               <li class="nav-item"><a href="#/app/home" class="nav-link"><i class="nav-icon bi bi-house-fill"></i><p>หน้าแรก</p></a></li>
+              <li class="nav-item"><a href="#/app/howto" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>How to Use</p></a></li>
               <li class="nav-item"><a href="#/app/fetch-static-page" class="nav-link"><i class="nav-icon bi bi-file-earmark-text"></i><p>Fetch Static Page</p></a></li>
-              <li class="nav-item"><a href="#/app/datatable" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Datatable</p></a></li>
+              <li class="nav-item"><a href="#/app/swal" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Swal</p></a></li>
+              <li class="nav-item"><a href="#/app/modal" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Modal</p></a></li>
+              <li class="nav-item"><a href="#/app/formdata-post" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>FormData</p></a></li>
+              <li class="nav-item"><a href="#/app/connect-database" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Connect Database</p></a></li>
+              <li class="nav-item"><a href="#/app/datatable-standard" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Datatable Standard</p></a></li>
+              <li class="nav-item"><a href="#/app/datatable-advance" class="nav-link"><i class="nav-icon bi bi-postcard"></i><p>Datatable Advance</p></a></li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-database"></i><p>Master Data<i class="nav-arrow bi bi-chevron-right"></i></p></a>

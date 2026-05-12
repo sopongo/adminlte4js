@@ -196,9 +196,29 @@ input[type="time"].form-control {
     animation: swal2-show 0.4s cubic-bezier(.34,1.56,.64,1) !important;
 }
 
-.btn_color1{
-    background-color: #F59E0B !important;
+.btn-warning-2 {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #F59E0B;
+  --bs-btn-border-color: #F59E0B;
+  
+  /* ปรับสี Hover ให้อ่อนลง (สว่างขึ้น) */
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #fbbf24; /* สีเหลืองที่สว่างขึ้น */
+  --bs-btn-hover-border-color: #fbbf24;
+  
+  --bs-btn-focus-shadow-rgb: 245, 158, 11;
+  
+  /* ปรับสี Active ให้เข้มขึ้นเวลาถูกกด */
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #d97706; 
+  --bs-btn-active-border-color: #d97706;
+  
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #F59E0B;
+  --bs-btn-disabled-border-color: #F59E0B;
 }
+
 
 
 .scrollup {

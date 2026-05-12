@@ -51,12 +51,92 @@ require_once 'include/auth.inc.php'; // รวมไฟล์ auth.inc.php
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+    
   </head>
   <!--end::Head-->
 
   <!--begin::Body-->
   <body class="login-page bg-body-login">
+    
+    <!-- 3D Background Canvas -->
+    <canvas id="three-canvas"></canvas>
+
     <div class="app"></div>
+
+        <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Tech Box (Representing Logistic Node)
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0x10408f, 
+                wireframe: true,
+                transparent: true,
+                opacity: 0.5
+            });
+            box = new THREE.Mesh(geometry, material);
+            scene.add(box);
+
+            // Particles (Representing Data Flow)
+            const pGeometry = new THREE.BufferGeometry();
+            const pCount = 500;
+            const coords = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount * 3; i++) {
+                coords[i] = (Math.random() - 0.5) * 20;
+            }
+            pGeometry.setAttribute('position', new THREE.BufferAttribute(coords, 3));
+            const pMaterial = new THREE.PointsMaterial({ color: 0x10408f, size: 0.04, transparent: true, opacity: 0.7 });
+            particles = new THREE.Points(pGeometry, pMaterial);
+            scene.add(particles);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 0.3);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+            camera.position.z = 5;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            box.rotation.x += 0.005;
+            box.rotation.y += 0.005;
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+
+        window.onload = () => {
+            initThree();
+            animate();
+        };
+
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
 
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->

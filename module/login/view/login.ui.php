@@ -5,7 +5,7 @@ require_once 'include/language.inc.php';
 Language::lang_Login;
 //echo password_hash(MySetting::Hash.(1234), PASSWORD_DEFAULT);
 ?>
-<div class="login-box">
+<div class="login-box w-100 justify-content-center align-items-center">
       <div class="login-logo">
         <strong><?php echo Language::lang_Login[$_SESSION['lang']]['title_0']; ?></strong>
       </div>
@@ -53,6 +53,6 @@ Language::lang_Login;
         </div>
         <!-- /.login-card-body -->
       </div>
-    <div class="text-sm-center small mt-3 text-muted">Copyright © 2025 - <?php echo date('Y'); ?><br />All rights reserved by <?php echo MySetting::Owner; ?>. (Version <?php echo MySetting::Version; ?>)</div>      
+    <span class=" w-100 text-sm-center small mt-3 text-muted justify-content-center align-items-center m-auto">Copyright © 2025 - <?php echo date('Y'); ?> <br />All rights reserved by <?php echo MySetting::Owner; ?>. (Version <?php echo MySetting::Version; ?>)</span>      
     </div>
     <!-- /.login-box -->

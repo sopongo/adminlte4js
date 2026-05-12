@@ -117,8 +117,54 @@ switch ($action) {
         ]);
     break;
 
-    case 'dashboard':
+    case 'swal':
+        //$result_html = renderView('module/login/view/view.inc.php');
+        echo json_encode([
+            'status'      => 'success',
+            'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK
+            'message'     => 'Swal page fetched successfully',
+            'meta-title' => 'Swal fire', // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
+            'title-page' => 'Swal fire',
+            'result_html' => renderView('module/swal/view/swal.ui.php'),
+            'result_js'   => renderView('module/swal/control/swal.js.php'),
+            'result_css'  => renderView('module/swal/view/swal.css.php'), // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป           
+            // เพิ่มส่วนนี้เพื่อส่งแท็กที่ต้องการโหลดไปที่ Header ของหน้าเว็บด้วย
+            'result_header' => '
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+            <script src="module/swal/control/script_header.js"></script>'
+        ]);
+    break;
+
     case 'home':
+        //$result_html = renderView('module/login/view/view.inc.php');
+        echo json_encode([
+            'status'      => 'success',
+            'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK
+            'message'     => 'Home page fetched successfully',
+            'meta-title' => Language::lang_menu[$_SESSION['lang']]['text_1'], // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
+            'title-page' => Language::lang_menu[$_SESSION['lang']]['text_1'],
+            'result_html' => renderView('module/home/view/home.ui.php'),
+            'result_js'   => renderView('module/home/control/home.js.php'),
+            'result_css'  => renderView('module/home/view/home.css.php') // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+        ]);
+    break;
+
+    case 'howto':
+        //$result_html = renderView('module/login/view/view.inc.php');
+        echo json_encode([
+            'status'      => 'success',
+            'http_code'   => http_response_code(200), // เบื้องต้นกำหนดสถานะการตอบกลับเป็น 200 OK
+            'message'     => 'How to Use page fetched successfully',
+            'meta-title' => Language::lang_menu[$_SESSION['lang']]['text_2'], // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
+            'title-page' => Language::lang_menu[$_SESSION['lang']]['text_2'],
+            'result_html' => renderView('module/howto/view/howto.ui.php'),
+            'result_js'   => renderView('module/howto/control/howto.js.php'),
+            //'result_css'  => renderView('module/howto/view/howto.css.php') // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+        ]);
+    break;
+
+    case 'dashboard':
         //$result_html = renderView('module/dashboard/view/dashboard.ui.php');
         echo json_encode([
             'status'      => 'success',
@@ -127,7 +173,8 @@ switch ($action) {
             'meta-title' => Language::lang_menu[$_SESSION['lang']]['text_3'], // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
             'title-page' => Language::lang_menu[$_SESSION['lang']]['text_3'],
             'result_html' => renderView('module/dashboard/view/dashboard.ui.php'),
-            'result_js'   => '' // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+            'result_js'   => '', // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+            'result_css'  => '' // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
         ]);
     break;
 
@@ -140,7 +187,8 @@ switch ($action) {
             'meta-title' => Language::lang_Login[$_SESSION['lang']]['title_0'], // ส่ง meta-title กลับไปเพื่อให้ JavaScript ฝั่ง Client สามารถตั้งค่า Title ของหน้าเว็บได้ตามที่ Backend กำหนด
             'title-page' => Language::lang_Login[$_SESSION['lang']]['title_0'],
             'result_html' => renderView('module/login/view/login.ui.php'),
-            'result_js'   => renderView('module/login/view/login.js.php')
+            'result_js'   => renderView('module/login/view/login.js.php'),
+            'result_css'  => renderView('module/login/view/login.css.php') // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
         ]);
     break;
 
@@ -172,7 +220,8 @@ switch ($action) {
                 'message' => 'Login successful', 
                 'result_html' => $result_html,
                 'result_html_menu' => $result_html_menu,
-                'result_js' => '' // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+                'result_js' => '', // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+                'result_css' => '' // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
                 ]);
         } else {
             http_response_code(401); // Unauthorized
@@ -182,7 +231,8 @@ switch ($action) {
                 'message' => Language::lang_Login[$_SESSION['lang']]['warning_4'],
                 'result_html' => '<div class="alert alert-danger">' . Language::lang_Login[$_SESSION['lang']]['warning_4'] . '</div>',
                 'result_html_menu' => '', // ถ้าไม่มีเมนูที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
-                'result_js' => '' // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+                'result_js' => '', // ถ้าไม่มี JavaScript ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
+                'result_css' => '' // ถ้าไม่มี CSS ที่จะส่งกลับมา ให้ส่งเป็นค่าว่างไป
                 ]);
         }
         break;
@@ -195,7 +245,8 @@ switch ($action) {
             'message' => 'Invalid action', 
             'result_html' => '', 
             'result_html_menu' => '', 
-            'result_js' => ''
+            'result_js' => '',
+            'result_css' => ''
         ]);
         break;
 }

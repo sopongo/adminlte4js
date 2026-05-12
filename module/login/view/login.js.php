@@ -32,28 +32,10 @@ function initFormEvents() {
             .then(data => {
                 console.log("Fetch response:", data); // Debug: ดูข้อมูลที่ได้รับจาก Fetch
                 if (data.status === 'success') {
-<<<<<<< Updated upstream
                     showSuccess("<?php echo Language::lang_Login[$_SESSION['lang']]['warning_6']; ?>", "<?php echo Language::lang_Login[$_SESSION['lang']]['warning_8']; ?>", false, 2000);
                     // อาจจะทำการ Redirect หรือโหลดเนื้อหาใหม่ที่นี่
                     window.location.href = '#/app/home'; // ตัวอย่างการ Redirect ไปหน้า Dashboard หลัง Login สำเร็จ
                     window.location.reload(); // รีโหลดหน้าเพื่อให้แสดงเนื้อหาที่เปลี่ยนไปหลังจากล็อกอินสำเร็จ
-=======
-                    showSuccess("<?php echo Language::lang_Login[$_SESSION['lang']]['warning_6']; ?>", "<?php echo Language::lang_Login[$_SESSION['lang']]['warning_8']; ?>", false, 1000);
-
-                    const targetHash = data.redirect || '#/app/home';
-                    const targetUrl = `${window.location.pathname}${window.location.search}${targetHash}`;
-
-                    // Replace history entry ของหน้า login เพื่อไม่ให้ย้อนกลับมาเจอหน้า login อีก
-                    if (window.history && typeof window.history.replaceState === 'function') {
-                        window.history.replaceState(null, '', targetUrl);
-                        window.dispatchEvent(new Event('hashchange'));
-                        if (!document.getElementById('left-sidebar-menu')) {
-                            window.location.replace(targetUrl);
-                        }
-                    } else {
-                        window.location.replace(targetUrl);
-                    }
->>>>>>> Stashed changes
                 } else {
                     showAlert(data.message || "<?php echo Language::lang_Login[$_SESSION['lang']]['warning_4']; ?>", 'error', "<?php echo Language::lang_Login[$_SESSION['lang']]['warning_7']; ?>");
                 }

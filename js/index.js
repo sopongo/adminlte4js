@@ -179,57 +179,128 @@ window.addEventListener('DOMContentLoaded', () => {
     // ===================================================
     // 5. ฟังก์ชันจัดการ Route เปลี่ยนหน้าเพจ (SPA Logic)
     // ===================================================
-    const handleRoute = () => {
-        const appContainer = document.querySelector('.app');
-        const path = window.location.hash.replace('#/app/', '');
+    /**
+ * ฟังก์ชันสำหรับฉีด Link และ Script เข้าไปใน <head>
+ * โดยจะตรวจสอบก่อนว่าไฟล์นั้นๆ เคยถูกโหลดไปแล้วหรือยัง เพื่อป้องกันการโหลดซ้ำ
+ */
+const injectHeaderAssets = (htmlString) => {
+    if (!htmlString) return Promise.resolve();
 
-        updateActiveMenu();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    const assets = tempDiv.querySelectorAll('link, script');
+    const promises = [];
 
-        if (!document.querySelector('.loading-overlay')) {
-            const overlayHTML = `
-                <div class="loading-overlay">
-                    <div class="spinner-border text-gray" role="status" style="width: 6rem; height: 6rem; border-width: 0.6rem;">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <div class="loading-text">กำลังจัดการข้อมูล...</div>
+    assets.forEach(asset => {
+        let exists = false;
+        let newElement;
+
+        // จัดการแท็ก <link> (CSS)
+        if (asset.tagName === 'LINK') {
+            const href = asset.getAttribute('href');
+            exists = !!document.querySelector(`link[href="${href}"]`);
+            if (!exists) {
+                newElement = document.createElement('link');
+                Array.from(asset.attributes).forEach(attr => newElement.setAttribute(attr.name, attr.value));
+            }
+        } 
+        // จัดการแท็ก <script> (JS ภายนอกที่มี src)
+        else if (asset.tagName === 'SCRIPT' && asset.getAttribute('src')) {
+            const src = asset.getAttribute('src');
+            exists = !!document.querySelector(`script[src="${src}"]`);
+            if (!exists) {
+                newElement = document.createElement('script');
+                Array.from(asset.attributes).forEach(attr => newElement.setAttribute(attr.name, attr.value));
+                
+                // สร้าง Promise เพื่อรอให้ไฟล์ JS โหลดเสร็จก่อน เพื่อให้โค้ดในหน้าหลักเรียกใช้งาน Library ได้ทันที
+                const p = new Promise((resolve, reject) => {
+                    newElement.onload = resolve;
+                    newElement.onerror = reject;
+                });
+                promises.push(p);
+            }
+        }
+
+        if (newElement) {
+            document.head.appendChild(newElement);
+        }
+    });
+
+    // คืนค่าเป็น Promise.all เพื่อรอให้ทุกไฟล์โหลดเสร็จสมบูรณ์
+    return Promise.all(promises);
+};
+
+const handleRoute = () => {
+    const appContainer = document.querySelector('.app');
+    const path = window.location.hash.replace('#/app/', '');
+
+    updateActiveMenu();
+
+    // แสดง Loading Overlay
+    if (!document.querySelector('.loading-overlay')) {
+        const overlayHTML = `
+            <div class="loading-overlay">
+                <div class="spinner-border text-gray" role="status" style="width: 6rem; height: 6rem; border-width: 0.6rem;">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-            `;
-            appContainer.insertAdjacentHTML('afterbegin', overlayHTML);
-        }
+                <div class="loading-text">กำลังจัดการข้อมูล...</div>
+            </div>
+        `;
+        appContainer.insertAdjacentHTML('afterbegin', overlayHTML);
+    }
 
-        const actionPage = path.split('/')[0] || 'dashboard';
-        const idSegment = path.split('/')[1] || null;
-        console.log("Parsed Action Page:", actionPage);
+    const actionPage = path.split('/')[0] || 'dashboard';
+    const idSegment = path.split('/')[1] || null;
+    console.log("Parsed Action Page:", actionPage);
 
-        if (isNaN(idSegment) && idSegment !== null) {
-            Swal.fire('ข้อผิดพลาด', 'ID ที่ระบุไม่ถูกต้อง', 'error');
-            console.warn("ID segment is not a number:", idSegment);
-        }
+    if (isNaN(idSegment) && idSegment !== null) {
+        Swal.fire('ข้อผิดพลาด', 'ID ที่ระบุไม่ถูกต้อง', 'error');
+        console.warn("ID segment is not a number:", idSegment);
+    }
 
-        if (actionPage) {
-            fetch('fetch.inc.php?p=' + actionPage, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: actionPage, id: idSegment })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                // ✅ DEBUG: ดูให้ชัดว่า server ส่งอะไรมาจริง
-                console.log('fetch.inc.php response:', data);
+    if (actionPage) {
+        fetch('fetch.inc.php?p=' + actionPage, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: actionPage, id: idSegment })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            console.log('fetch.inc.php response:', data);
 
-                // 1. เปลี่ยน Title ของหน้าเว็บตามที่ Backend ส่งมา
+            // ===================================================
+            // เริ่มต้นการจัดการ Assets ใน Header ก่อน
+            // ===================================================
+            injectHeaderAssets(data.result_header).then(() => {
+                
+                // 1. เปลี่ยน Title และข้อมูลหัวหน้าเพจ
                 data['meta-title'] && (document.title = data['meta-title'] + ' | CMMS');                
                 data['title-page'] && (document.querySelector('.title-page').innerText = data['title-page']);
-                //data['sub-title-page'] && (document.querySelector('.sub-title-page').innerHTML = data['sub-title-page']);
-                document.querySelector('.sub-title-page') && (document.querySelector('.sub-title-page').innerHTML = data['sub-title-page'] || '');
+                
+                // ตรวจสอบและแสดง Sub Title ถ้าไม่มีให้ว่างไว้
+                const subTitleEl = document.querySelector('.sub-title-page');
+                if (subTitleEl) subTitleEl.innerHTML = data['sub-title-page'] || '';
 
-                // 2. แทนที่เนื้อหาหน้าเพจ
+                // 2. จัดการ CSS เฉพาะโมดูล (dynamic-module-css)
+                let dynamicStyle = document.getElementById('dynamic-module-css');
+                if (data.result_css) {
+                    if (!dynamicStyle) {
+                        dynamicStyle = document.createElement('style');
+                        dynamicStyle.id = 'dynamic-module-css';
+                        document.head.appendChild(dynamicStyle);
+                    }
+                    dynamicStyle.textContent = data.result_css;
+                } else if (dynamicStyle) {
+                    dynamicStyle.textContent = '';
+                }
+
+                // 3. แทนที่เนื้อหา HTML หลัก
                 appContainer.innerHTML = data.result_html;
 
-                // 3. ค้นหาและรัน <script> ในเนื้อหาที่เพิ่งฉีดเข้ามา
+                // 4. รันสคริปต์ที่แฝงมากับ HTML (ถ้ามี)
                 const scripts = appContainer.querySelectorAll("script");
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -238,22 +309,28 @@ window.addEventListener('DOMContentLoaded', () => {
                     oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
                 
-                // 4. รัน JavaScript เพิ่มเติมที่ส่งมา (result_js)
+                // 5. รัน JavaScript เพิ่มเติม (result_js) 
+                // ใช้ requestAnimationFrame และ setTimeout เพื่อรอให้ DOM พร้อมใช้งาน 100% ป้องกัน Error
                 if (data.result_js) {
-                    const scriptTag = document.createElement('script');
-                    scriptTag.text = data.result_js;
-                    document.body.appendChild(scriptTag);
-                    scriptTag.remove(); 
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            const scriptTag = document.createElement('script');
+                            scriptTag.text = data.result_js;
+                            document.body.appendChild(scriptTag);
+                            scriptTag.remove(); 
+                        }, 0);
+                    });
                 }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                const overlay = document.querySelector('.loading-overlay');
-                if (overlay) overlay.remove();
-                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
             });
-        }
-    };
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            const overlay = document.querySelector('.loading-overlay');
+            if (overlay) overlay.remove();
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
+        });
+    }
+};
 
     // ===================================================
     // 6. การผูก Event และสั่งเริ่มทำงานตอนเปิดเว็บ
